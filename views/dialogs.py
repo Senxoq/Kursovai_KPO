@@ -4,6 +4,7 @@ import tkinter as tk
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 import calendar
 from tkcalendar import DateEntry
 import sqlite3
@@ -48,14 +49,14 @@ class ProfileDialog(ctk.CTkToplevel):
         scroll_frame = ctk.CTkScrollableFrame(main, fg_color="transparent", height=450)
         scroll_frame.pack(fill="both", expand=True, pady=10)
 
-        # Имя
+
         ctk.CTkLabel(scroll_frame, text="Имя:", font=("Segoe UI", 14, "bold"),
                      text_color="#ffffff").pack(anchor="w")
         self.name_entry = ctk.CTkEntry(scroll_frame, width=450, height=40, corner_radius=15,
                                        fg_color="#1a1a1a")
         self.name_entry.pack(fill="x", pady=(5, 15))
 
-        # Пол
+
         ctk.CTkLabel(scroll_frame, text="Пол:", font=("Segoe UI", 14, "bold"),
                      text_color="#ffffff").pack(anchor="w", pady=(0, 5))
         self.gender_var = tk.StringVar(value="male")
@@ -66,43 +67,43 @@ class ProfileDialog(ctk.CTkToplevel):
         ctk.CTkRadioButton(gender_frame, text="👩 Женский", variable=self.gender_var, value="female",
                            text_color="#ffffff").pack(side="left", padx=10)
 
-        # Возраст
+
         ctk.CTkLabel(scroll_frame, text="Возраст (лет):", font=("Segoe UI", 14, "bold"),
                      text_color="#ffffff").pack(anchor="w")
         self.age_entry = ctk.CTkEntry(scroll_frame, width=200, height=40, corner_radius=15,
                                       fg_color="#1a1a1a")
         self.age_entry.pack(anchor="w", pady=(5, 15))
 
-        # Вес
+
         ctk.CTkLabel(scroll_frame, text="Вес (кг):", font=("Segoe UI", 14, "bold"),
                      text_color="#ffffff").pack(anchor="w")
         self.weight_entry = ctk.CTkEntry(scroll_frame, width=200, height=40, corner_radius=15,
                                          fg_color="#1a1a1a")
         self.weight_entry.pack(anchor="w", pady=(5, 15))
 
-        # Рост
+
         ctk.CTkLabel(scroll_frame, text="Рост (см):", font=("Segoe UI", 14, "bold"),
                      text_color="#ffffff").pack(anchor="w")
         self.height_entry = ctk.CTkEntry(scroll_frame, width=200, height=40, corner_radius=15,
                                          fg_color="#1a1a1a")
         self.height_entry.pack(anchor="w", pady=(5, 15))
 
-        # Активность
+
         ctk.CTkLabel(scroll_frame, text="Уровень активности:", font=("Segoe UI", 14, "bold"),
                      text_color="#ffffff").pack(anchor="w", pady=(0, 5))
         self.activity_var = tk.StringVar(value="moderate")
         acts = [
             ("🛋️ Сидячий", "sedentary"),
-            ("🚶 Легкая", "light"),
-            ("🏃 Средняя", "moderate"),
-            ("💪 Высокая", "active"),
-            ("⚡ Очень высокая", "very_active")
+            ("🚶 Легкая 1-2 дня тренировок", "light"),
+            ("🏃 Средняя 2-3 дня тренировок", "moderate"),
+            ("💪 Высокая 3-4 дня тренировок", "active"),
+            ("⚡ Очень высокая 4+ дня тренировок", "very_active")
         ]
         for text, val in acts:
             ctk.CTkRadioButton(scroll_frame, text=text, variable=self.activity_var, value=val,
                                text_color="#ffffff").pack(anchor="w", pady=4)
 
-        # Цель
+
         ctk.CTkLabel(scroll_frame, text="Цель:", font=("Segoe UI", 14, "bold"),
                      text_color="#ffffff").pack(anchor="w", pady=(10, 5))
         self.goal_var = tk.StringVar(value="maintain")
@@ -132,7 +133,7 @@ class ProfileDialog(ctk.CTkToplevel):
                       font=("Segoe UI", 14, "bold")).pack(side="right", padx=8)
 
     def load_user_data(self):
-        """Загрузка данных пользователя для редактирования"""
+
         self.db.cursor.execute("""
             SELECT name, age, gender, weight, height, activity_level, goal
             FROM users WHERE id=?
@@ -152,7 +153,7 @@ class ProfileDialog(ctk.CTkToplevel):
             self.title(f"✏️ Редактирование: {name}")
 
     def save_profile(self):
-        """Сохранение профиля"""
+
         try:
             name = self.name_entry.get().strip()
             if not name:
@@ -234,19 +235,19 @@ class StatsDialog(ctk.CTkToplevel):
         notebook = ctk.CTkTabview(main, corner_radius=15)
         notebook.pack(fill="both", expand=True)
 
-        # Вкладка 1 - Круговая диаграмма КБЖУ
+
         pie_tab = notebook.add("🥧 КБЖУ за день")
         self.setup_pie_tab(pie_tab)
 
-        # Вкладка 2 - График веса (ИСПРАВЛЕН)
+
         weight_tab = notebook.add("📈 Динамика веса")
         self.setup_weight_tab(weight_tab)
 
-        # Вкладка 3 - Прогресс по дням
+
         progress_tab = notebook.add("📊 Прогресс по дням")
         self.setup_progress_tab(progress_tab)
 
-        # Вкладка 4 - Календарь активности (ИСПРАВЛЕН)
+
         heatmap_tab = notebook.add("🔥 Календарь активности")
         self.setup_heatmap_tab(heatmap_tab)
 
@@ -337,28 +338,27 @@ class StatsDialog(ctk.CTkToplevel):
         canvas.get_tk_widget().pack(fill="both", expand=True, padx=10, pady=10)
 
     def setup_weight_tab(self, parent):
-        """Настройка вкладки графика веса"""
-        # Верхняя панель с информацией
+
         info_frame = ctk.CTkFrame(parent, fg_color="transparent")
         info_frame.pack(pady=10, fill="x")
 
         ctk.CTkLabel(info_frame, text="📈 График динамики веса", font=("Segoe UI", 16, "bold"),
                      text_color="#10B981").pack(side="left", padx=10)
 
-        # Кнопка обновления
+
         refresh_btn = ctk.CTkButton(info_frame, text="🔄 Обновить", command=self.update_weight_graph,
                                     width=100, height=32, corner_radius=15, fg_color="#3B82F6",
                                     font=("Segoe UI", 12))
         refresh_btn.pack(side="right", padx=10)
 
-        # Фрейм для графика
+
         self.weight_frame = ctk.CTkFrame(parent, fg_color="#1a1a3e", corner_radius=15)
         self.weight_frame.pack(fill="both", expand=True, padx=15, pady=10)
 
         self.update_weight_graph()
 
     def update_weight_graph(self):
-        """Обновление графика динамики веса"""
+
         for widget in self.weight_frame.winfo_children():
             widget.destroy()
 
@@ -367,14 +367,14 @@ class StatsDialog(ctk.CTkToplevel):
                          font=("Segoe UI", 16)).pack(expand=True)
             return
 
-        # Получаем данные из weight_log
+
         self.db.cursor.execute("""
             SELECT date, weight FROM weight_log 
             WHERE user_id=? ORDER BY date
         """, (self.user_id,))
         data = self.db.cursor.fetchall()
 
-        # Если нет данных, проверяем текущий вес из профиля
+
         if not data:
             self.db.cursor.execute("SELECT weight FROM users WHERE id=?", (self.user_id,))
             current_weight = self.db.cursor.fetchone()
@@ -388,14 +388,14 @@ class StatsDialog(ctk.CTkToplevel):
         dates = [row[0] for row in data]
         weights = [row[1] for row in data]
 
-        # Создаём фигуру с увеличенным размером
+
         fig, ax = plt.subplots(figsize=(9, 5), facecolor="#1a1a3e")
         ax.set_facecolor("#1a1a3e")
 
-        # Преобразуем даты в индексы для правильного отображения
+
         x = range(len(dates))
 
-        # Строим линию с маркерами
+
         ax.plot(x, weights, marker='o', linewidth=2.5, markersize=8, color="#10B981",
                 markerfacecolor='white', markeredgewidth=2, markeredgecolor="#10B981")
 
@@ -407,30 +407,30 @@ class StatsDialog(ctk.CTkToplevel):
         ax.set_ylabel('Вес (кг)', color='white', fontsize=11)
         ax.set_title('Динамика изменения веса', color='white', fontsize=13, pad=15)
 
-        # Настройка сетки
+
         ax.grid(True, alpha=0.2, color='white', linestyle='--')
         ax.yaxis.grid(True, alpha=0.3)
 
-        # Настройка цветов осей
+
         ax.tick_params(axis='x', colors='#888888', labelsize=9)
         ax.tick_params(axis='y', colors='#888888', labelsize=10)
 
-        # Устанавливаем подписи дат (показываем каждые N дней, чтобы не было нагромождения)
+
         step = max(1, len(dates) // 10)
         ax.set_xticks(x[::step])
         ax.set_xticklabels([dates[i][5:] for i in range(0, len(dates), step)], rotation=45, ha='right')
 
-        # Настройка рамки
+
         for spine in ax.spines.values():
             spine.set_color('#888888')
             spine.set_linewidth(0.5)
 
-        # Добавляем значения над точками
+
         for i, (date, weight) in enumerate(zip(dates, weights)):
             ax.annotate(f'{weight:.1f}', (i, weight), textcoords="offset points",
                         xytext=(0, 10), ha='center', color='white', fontsize=8)
 
-        # Рассчитываем тренд (линейную регрессию)
+
         if len(weights) > 1:
             from numpy import polyfit
             try:
@@ -439,7 +439,7 @@ class StatsDialog(ctk.CTkToplevel):
                 ax.plot(x, trend_line, '--', linewidth=1.5, color='#F59E0B', alpha=0.7, label='Линия тренда')
                 ax.legend(loc='upper right', facecolor='#1a1a3e', labelcolor='white', fontsize=10)
 
-                # Изменение веса
+
                 if len(weights) >= 2:
                     first_weight = weights[0]
                     last_weight = weights[-1]
@@ -454,7 +454,7 @@ class StatsDialog(ctk.CTkToplevel):
                         trend_text = f"➖ Изменение: 0 кг"
                         trend_color = "#888888"
 
-                    # Добавляем информацию об изменении в угол графика
+
                     ax.text(0.02, 0.98, trend_text, transform=ax.transAxes, fontsize=10,
                             verticalalignment='top', bbox=dict(boxstyle='round', facecolor='#1a1a3e', alpha=0.8),
                             color=trend_color)
@@ -554,7 +554,6 @@ class StatsDialog(ctk.CTkToplevel):
         canvas.get_tk_widget().pack(fill="both", expand=True, padx=10, pady=10)
 
     def setup_heatmap_tab(self, parent):
-        """Настройка вкладки календаря активности"""
         control_frame = ctk.CTkFrame(parent, fg_color="transparent")
         control_frame.pack(pady=15, fill="x")
 
@@ -578,7 +577,6 @@ class StatsDialog(ctk.CTkToplevel):
         self.update_heatmap()
 
     def update_heatmap(self):
-        """Обновление календаря активности"""
         for widget in self.heatmap_frame.winfo_children():
             widget.destroy()
 
@@ -846,7 +844,7 @@ class CustomProductDialog(ctk.CTkToplevel):
         ctk.CTkLabel(main, text="✨ Новый продукт", font=("Segoe UI", 24, "bold"),
                      text_color="#10B981").pack(pady=(0, 25))
 
-        # Иконка
+
         icon_frame = ctk.CTkFrame(main, fg_color="transparent")
         icon_frame.pack(fill="x", pady=10)
 
@@ -858,18 +856,18 @@ class CustomProductDialog(ctk.CTkToplevel):
                                      variable=self.icon_var, width=120)
         icon_combo.pack(side="left", padx=10)
 
-        # Название
+
         ctk.CTkLabel(main, text="Название продукта:", font=("Segoe UI", 14, "bold"),
                      text_color="#ffffff").pack(anchor="w")
         self.name_entry = ctk.CTkEntry(main, width=400, height=40, corner_radius=15,
                                        fg_color="#1a1a1a", font=("Segoe UI", 13))
         self.name_entry.pack(fill="x", pady=(5, 20))
 
-        # Пищевая ценность
+
         ctk.CTkLabel(main, text="Пищевая ценность на 100 г:", font=("Segoe UI", 16, "bold"),
                      text_color="#10B981").pack(anchor="w", pady=(0, 15))
 
-        # Калории
+
         cal_frame = ctk.CTkFrame(main, fg_color="transparent")
         cal_frame.pack(fill="x", pady=5)
         ctk.CTkLabel(cal_frame, text="🔥 Калории:", width=100, font=("Segoe UI", 13),
@@ -879,7 +877,7 @@ class CustomProductDialog(ctk.CTkToplevel):
         self.cal_entry.pack(side="left", padx=10)
         ctk.CTkLabel(cal_frame, text="ккал", font=("Segoe UI", 13), text_color="#888888").pack(side="left", padx=5)
 
-        # Белки
+
         prot_frame = ctk.CTkFrame(main, fg_color="transparent")
         prot_frame.pack(fill="x", pady=5)
         ctk.CTkLabel(prot_frame, text="🍗 Белки:", width=100, font=("Segoe UI", 13),
@@ -889,7 +887,7 @@ class CustomProductDialog(ctk.CTkToplevel):
         self.prot_entry.pack(side="left", padx=10)
         ctk.CTkLabel(prot_frame, text="г", font=("Segoe UI", 13), text_color="#888888").pack(side="left", padx=5)
 
-        # Жиры
+
         fat_frame = ctk.CTkFrame(main, fg_color="transparent")
         fat_frame.pack(fill="x", pady=5)
         ctk.CTkLabel(fat_frame, text="🧈 Жиры:", width=100, font=("Segoe UI", 13),
@@ -899,7 +897,7 @@ class CustomProductDialog(ctk.CTkToplevel):
         self.fat_entry.pack(side="left", padx=10)
         ctk.CTkLabel(fat_frame, text="г", font=("Segoe UI", 13), text_color="#888888").pack(side="left", padx=5)
 
-        # Углеводы
+
         carb_frame = ctk.CTkFrame(main, fg_color="transparent")
         carb_frame.pack(fill="x", pady=5)
         ctk.CTkLabel(carb_frame, text="🍚 Углеводы:", width=100, font=("Segoe UI", 13),
@@ -911,6 +909,28 @@ class CustomProductDialog(ctk.CTkToplevel):
 
         btn_frame = ctk.CTkFrame(main, fg_color="transparent")
         btn_frame.pack(fill="x", pady=(30, 0))
+
+        def delete_product(self, product_name, product_id):
+            self.db.cursor.execute("SELECT COUNT(*) FROM meals WHERE product_id=?", (product_id,))
+            count = self.db.cursor.fetchone()[0]
+
+            if count > 0:
+                # Предлагаем два варианта
+                if messagebox.askyesno("Внимание",
+                                       f"Продукт '{product_name}' использован в {count} приёмах пищи.\n\n"
+                                       "Удалить его нельзя, но можно СКРЫТЬ из списка?\n\n"
+                                       "Да - скрыть, Нет - оставить как есть"):
+
+                    self.db.cursor.execute("UPDATE products SET hidden=1 WHERE id=?", (product_id,))
+                    self.db.conn.commit()
+                    messagebox.showinfo("Успех", f"Продукт '{product_name}' скрыт из списка")
+            else:
+
+                self.db.cursor.execute("DELETE FROM products WHERE id=?", (product_id,))
+                self.db.conn.commit()
+                messagebox.showinfo("Успех", f"Продукт '{product_name}' удалён")
+
+            self.load_products_list()
 
         def save_product():
             name = self.name_entry.get().strip()

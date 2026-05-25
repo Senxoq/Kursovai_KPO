@@ -8,10 +8,10 @@ def format_date(date_str: str) -> str:
 def get_activity_text(activity_level: str) -> str:
     activities = {
         "sedentary": "🛋️ Сидячий",
-        "light": "🚶 Легкая",
-        "moderate": "🏃 Средняя",
-        "active": "💪 Высокая",
-        "very_active": "⚡ Очень высокая"
+        "light": "🚶 Легкая 1-2 дня тренировок",
+        "moderate": "🏃 Средняя 2-3 дня тренировок",
+        "active": "💪 Высокая 3-4 дня тренировок",
+        "very_active": "⚡ Очень высокая 4+ дня тренировок"
     }
     return activities.get(activity_level, "Средняя")
 

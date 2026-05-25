@@ -88,12 +88,11 @@ class MainWindow(ctk.CTk):
     def setup_ui(self):
         self.configure(fg_color=self.colors["bg"])
 
-        # Верхняя панель
+
         top_frame = ctk.CTkFrame(self, height=80, corner_radius=0, fg_color=self.colors["secondary"])
         top_frame.pack(fill="x", padx=0, pady=0)
         top_frame.pack_propagate(False)
 
-        # Левая часть - логотип и имя пользователя в одной строке
         left_frame = ctk.CTkFrame(top_frame, fg_color="transparent")
         left_frame.place(relx=0.02, rely=0.5, anchor="w")
 
@@ -104,7 +103,6 @@ class MainWindow(ctk.CTk):
                                        text_color=self.colors["text_secondary"])
         self.user_label.pack(side="left", padx=(20, 0))
 
-        # Кнопки (справа)
         btn_frame = ctk.CTkFrame(top_frame, fg_color="transparent")
         btn_frame.place(relx=0.98, rely=0.5, anchor="e")
 
@@ -124,23 +122,23 @@ class MainWindow(ctk.CTk):
                       width=120, height=40, corner_radius=15, fg_color=self.colors["card_light"],
                       font=("Segoe UI", 12)).pack(side="left", padx=5)
 
-        # Основной контент
+
         main_frame = ctk.CTkFrame(self, fg_color="transparent")
         main_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
-        # Левая панель
+
         left_panel = ctk.CTkFrame(main_frame, width=350, corner_radius=20, fg_color=self.colors["card"])
         left_panel.pack(side="left", fill="both", padx=(0, 10))
         left_panel.pack_propagate(False)
         self.setup_left_panel(left_panel)
 
-        # Центральная панель
+
         center_panel = ctk.CTkFrame(main_frame, width=500, corner_radius=20, fg_color=self.colors["card"])
         center_panel.pack(side="left", fill="both", padx=10)
         center_panel.pack_propagate(False)
         self.setup_center_panel(center_panel)
 
-        # Правая панель
+
         right_panel = ctk.CTkFrame(main_frame, width=500, corner_radius=20, fg_color=self.colors["card"])
         right_panel.pack(side="right", fill="both", padx=(10, 0))
         right_panel.pack_propagate(False)
@@ -150,7 +148,24 @@ class MainWindow(ctk.CTk):
         if not self.current_user_id:
             messagebox.showwarning("Внимание", "Сначала выберите пользователя")
             return
-        CustomProductDialog(self, self.db, self.load_products_list)
+
+        def on_product_added():
+            # ✅ Сбрасываем выделение
+            if self.selected_card:
+                try:
+                    if self.selected_card.winfo_exists():
+                        self.selected_card.configure(fg_color=self.colors["card_light"])
+                        self.selected_card.border_width = 0
+                except:
+                    pass
+                self.selected_card = None
+            self.selected_product = None
+            self.selected_label.configure(text="❌ Продукт не выбран", text_color=self.colors["text_secondary"])
+
+            # Обновляем список
+            self.load_products_list(self.product_search.get())
+
+        CustomProductDialog(self, self.db, on_product_added)
 
     def add_weight_dialog(self):
         if not self.current_user_id:
@@ -377,8 +392,6 @@ class MainWindow(ctk.CTk):
         ctk.CTkLabel(f1, text=f"{calories:.0f}", font=("Segoe UI", 12, "bold"),
                      text_color=self.colors["primary"]).pack(side="left")
         ctk.CTkLabel(f1, text="ккал", font=("Segoe UI", 8), text_color=self.colors["text_secondary"]).pack(side="left")
-
-        # Белки
         f2 = ctk.CTkFrame(center, fg_color="transparent")
         f2.pack(side="left", padx=4)
         ctk.CTkLabel(f2, text="🍗", font=("Segoe UI", 12)).pack(side="left")
@@ -386,7 +399,7 @@ class MainWindow(ctk.CTk):
                      text_color="#3B82F6").pack(side="left")
         ctk.CTkLabel(f2, text="г", font=("Segoe UI", 8), text_color=self.colors["text_secondary"]).pack(side="left")
 
-        # Жиры
+
         f3 = ctk.CTkFrame(center, fg_color="transparent")
         f3.pack(side="left", padx=4)
         ctk.CTkLabel(f3, text="🧈", font=("Segoe UI", 12)).pack(side="left")
@@ -394,7 +407,7 @@ class MainWindow(ctk.CTk):
                      text_color="#F59E0B").pack(side="left")
         ctk.CTkLabel(f3, text="г", font=("Segoe UI", 8), text_color=self.colors["text_secondary"]).pack(side="left")
 
-        # Углеводы
+
         f4 = ctk.CTkFrame(center, fg_color="transparent")
         f4.pack(side="left", padx=4)
         ctk.CTkLabel(f4, text="🍚", font=("Segoe UI", 12)).pack(side="left")
@@ -477,6 +490,19 @@ class MainWindow(ctk.CTk):
             self.load_today_meals()
             self.update_stats()
             self.update_progress_bars()
+
+
+            if self.selected_card:
+                try:
+                    if self.selected_card.winfo_exists():
+                        self.selected_card.configure(fg_color=self.colors["card_light"])
+                        self.selected_card.border_width = 0
+                except:
+                    pass
+                self.selected_card = None
+            self.selected_product = None
+            self.selected_label.configure(text="❌ Продукт не выбран", text_color=self.colors["text_secondary"])
+
             messagebox.showinfo("Успех", f"✅ {name} ({weight:.0f} г) добавлен!")
 
         except ValueError:
@@ -744,6 +770,6 @@ class MainWindow(ctk.CTk):
         self.date_label.configure(text=datetime.strptime(self.current_date, "%Y-%m-%d").strftime("%d.%m.%Y"))
 
     def show_user_manager(self):
-        """Показать менеджер пользователей"""
+
         from views.user_manager import UserManagerDialog
         UserManagerDialog(self, self.db, self.set_current_user)
